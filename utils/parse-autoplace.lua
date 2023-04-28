@@ -438,6 +438,7 @@ local function find_autoplace_argument(argument, autoplace, breadthFirst)
       end
       return (found * 10), indexTable
     end
+    identifiers["regular_rq_factor_multiplier"].default = 1
     identifiers["starting_rq_factor_multiplier"].addTarget({
       literal_value = {
         arguments = {
@@ -472,6 +473,7 @@ local function find_autoplace_argument(argument, autoplace, breadthFirst)
       end
       return (found * 7), indexTable
     end
+    identifiers["starting_rq_factor_multiplier"].default = 1
     setmetatable(identifiers, {}) -- make sure bad indexes properly return nil again
   end
 

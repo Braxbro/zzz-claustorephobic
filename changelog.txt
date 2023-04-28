@@ -1,5 +1,12 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.0.1
+Date: 2023-04-28
+  Balancing:
+    - Readjusted richness expressions to more closely match normal ore generation. 
+      Total ore count should be reduced nearly 200-fold compared to v1.0.0, enabling faster expansion.
+---------------------------------------------------------------------------------------------------
 Version: 1.0.0
+Date: 2023-04-27
   Info:
     - First release of ClaustOrephobic.
   Major Features:
@@ -9,8 +16,3 @@ Version: 1.0.0
     - Custom placement restrictions.
     - 4 ore generation presets: Scrambled, Noise, Pie, and Spiral.
     - Automatic detection and support of modded ores.
----------------------------------------------------------------------------------------------------
-Version: 1.0.1
-  Balancing:
-    - Readjusted richness expressions to more closely match normal ore generation. 
-      Total ore count should be reduced nearly 200-fold compared to v1.0.0, enabling faster expansion.

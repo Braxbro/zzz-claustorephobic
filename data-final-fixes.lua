@@ -138,11 +138,12 @@ for toPlace, dataToPlace in pairs(oreData) do
 	orePrototypes[toPlace].autoplace.probability_expression = expression
 	probabilityExpression = expression
 	local richnessMultiplier = noise.get_control_setting(toPlace)["richness_multiplier"]
-	local rqMultiplier = dataToPlace.starting_rq_factor_multiplier + 
+	local rqMultiplier = dataToPlace.starting_rq_factor_multiplier +
 	(dataToPlace.regular_rq_factor_multiplier - dataToPlace.starting_rq_factor_multiplier) * regularInfluence
 	rqMultiplier = rqMultiplier * (adjustedDensity[toPlace] / dataToPlace.base_density) ^ (1/3)
 	local relativeStarterArea = 70 -- An estimate of how much larger the starting area is than the starter ore patches.
-	local richness = (relativeStarterArea ^ (1/3)) * totalDensity + (dataToPlace.additional_richness / relativeStarterArea * rqMultiplier) * (startingResourceInnerRadius / 120) ^ 2
+	local richness = (relativeStarterArea ^ (1/3)) * totalDensity + 
+	(dataToPlace.additional_richness / relativeStarterArea * rqMultiplier) * (startingResourceInnerRadius / 120) ^ 2
 	-- turns out, adjusting adjusted_density according to distribution equals totaldensity...
 	richness = richness * richnessMultiplier * dataToPlace.richness_post_multiplier
 	richness = richness * 
