@@ -26,7 +26,7 @@ for resourceName, prototype in pairs(resources) do
 			else
 				oreData[resourceName].index = i
 			end
-			-- log(longestDimension .. " " .. serpent.block(oreData[resourceName]))
+			log(longestDimension .. " " .. serpent.block(oreData[resourceName]))
 		end
 	end
 end
@@ -138,9 +138,16 @@ for toPlace, dataToPlace in pairs(oreData) do
 	orePrototypes[toPlace].autoplace.probability_expression = expression
 	probabilityExpression = expression
 	local richnessMultiplier = noise.get_control_setting(toPlace)["richness_multiplier"]
-	local richness = (5000 * adjustedDensity[toPlace] + dataToPlace.minimum_richness)
+	local rqMultiplier = dataToPlace.starting_rq_factor_multiplier + 
+	(dataToPlace.regular_rq_factor_multiplier - dataToPlace.starting_rq_factor_multiplier) * regularInfluence
+	rqMultiplier = rqMultiplier * (adjustedDensity[toPlace] / dataToPlace.base_density) ^ (1/3)
+	local relativeStarterArea = 70 -- An estimate of how much larger the starting area is than the starter ore patches.
+	local richness = (relativeStarterArea ^ (1/3)) * totalDensity + (dataToPlace.additional_richness / relativeStarterArea * rqMultiplier) * (startingResourceInnerRadius / 120) ^ 2
+	-- turns out, adjusting adjusted_density according to distribution equals totaldensity...
 	richness = richness * richnessMultiplier * dataToPlace.richness_post_multiplier
-	richness = richness * (1 + (noise.var("distance") * regularInfluence) / 1300)
+	richness = richness * 
+	(1 + (noise.clamp(noise.var("distance") - startingResourceOuterRadius, 0, math.huge) * regularInfluence) / (1300 / (relativeStarterArea ^ (1/3))))
+	richness = noise.max(richness, dataToPlace.minimum_richness)
 	orePrototypes[toPlace].autoplace.richness_expression = richness * probabilityExpression
 end
 log("Finished autoplace modifications.")

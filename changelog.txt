@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------------------------------
+Version: 1.0.0
+  Info:
+    - First release of ClaustOrephobic.
+  Major Features:
+    - Data-stage dangOreous-style ore generation.
+    - Functioning map preview of modified ore generation.
+    - Modified entity collision masks to limit placement without destroying items.
+    - Custom placement restrictions.
+    - 4 ore generation presets: Scrambled, Noise, Pie, and Spiral.
+    - Automatic detection and support of modded ores.
+---------------------------------------------------------------------------------------------------
+Version: 1.0.1
+  Balancing:
+    - Readjusted richness expressions to more closely match normal ore generation. 
+      Total ore count should be reduced nearly 200-fold compared to v1.0.0, enabling faster expansion.
