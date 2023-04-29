@@ -1,4 +1,16 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.0.2
+Date: 2023-04-28
+  Bugfixes:
+    - Non-starter ores no longer generate a sliver of ore in the starter ore area on pie and spiral presets, most noticeably in heavily modded saves.
+      Previously, if a regular ore was first or last in the internal placement order, a tiny sliver of it would appear in the starter ore area.
+      Starter ores now properly generate in place of these tiny slivers.
+    - Fixed a crash with certain modded ores that accidentally got shipped with v1.0.1.
+  Debug:
+    - Disabled a couple of logging statements to clean up the console for other mods.
+  Locale:
+    - Fixed a display issue with the changelog when viewed on mods.factorio.com.
+---------------------------------------------------------------------------------------------------
 Version: 1.0.1
 Date: 2023-04-28
   Balancing:
