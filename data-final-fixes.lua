@@ -144,8 +144,8 @@ for toPlace, dataToPlace in pairs(oreData) do
 		doPlace,
 		noise.less_or_equal(
 			noise.if_else_chain( -- widen range if at start or end of order to ensure no gaps
-				noise.equals(densityBelowTarget, 0)
-				- 1,
+				noise.equals(densityBelowTarget, 0),
+				-1,
 				densityBelowTarget
 			),
 			expression
