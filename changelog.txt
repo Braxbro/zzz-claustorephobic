@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.0.4
+Date: 2023-05-03
+  Bugfixes:
+    - Fixed a bug with collision masks allowing some entities to be incorrectly placed on ore.
+  Optimizations:
+    - Improved startup times slightly when loaded with mods with long chains of building upgrades.
+---------------------------------------------------------------------------------------------------
 Version: 1.0.3
 Date: 2023-04-29
   Bugfixes:

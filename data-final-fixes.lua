@@ -67,7 +67,7 @@ local totalDensity = totalStarterDensity + (totalRegularDensity - totalStarterDe
 log("ClaustOrephobic starting autoplace modifications.")
 for toPlace, dataToPlace in pairs(oreData) do
 	log("ClaustOrephobic modifying autoplace expressions of " .. toPlace .. "...")
-	orePrototypes[toPlace].autoplace.order = "e"
+	orePrototypes[toPlace].autoplace.order = "z" -- place absolute last in generation
 	local target = noise.random_penalty(1, 1, { x = tne(dataToPlace.index), y = noise.var("map_seed") })
 	local regularDensityBelowTarget
 	local starterDensityBelowTarget
@@ -196,39 +196,44 @@ if settings.startup["claustorephobic-easy-mode"].value then -- Only use easy mod
 	end
 end
 
+local maskUtil = require("collision-mask-util")
+local ownableEntities = require("utils.data.entities-with-owners") -- list of entityWithOwners
+local alteredPrototypes = {}
+
 log("ClaustOrephobic starting modification of collision masks.")
-for group, _ in pairs(defines.prototypes.entity) do
+for group, _ in pairs(ownableEntities) do
 	for _, prototype in pairs(data.raw[group]) do
-		if not util_functions.search_table(ignoredGroups, prototype.type) and prototype.collision_mask then
+		if
+			(not util_functions.search_table(ignoredGroups, prototype.type)) and
+			(prototype.collision_mask or maskUtil.get_default_mask(group))
+		then
 			-- only change prototypes that aren't excluded via easy-mode or initial list
-			local mask
-			local oldMask
-			local replaceGroup
-			if prototype then
-				while prototype.collision_mask do -- replicate changes through all upgrades, regardless of initial eligibility
-					oldMask = table.deepcopy(prototype.collision_mask)
-					replaceGroup = prototype.fast_replaceable_group
-					if not util_functions.search_table(prototype.collision_mask, "resource-layer") and not mask then
-						table.insert(prototype.collision_mask, "resource-layer")
-					elseif mask then
-						prototype.collision_mask = mask
-					end
-					mask = prototype.collision_mask
-					if prototype.next_upgrade then
-						for _, tbl in pairs(data.raw) do
-							for name, upgrade in pairs(tbl) do
-								if (
-										name == prototype.next_upgrade and
-										upgrade.fast_replaceable_group == replaceGroup and
-										upgrade.collision_mask and
-										util_functions.match(upgrade.collision_mask, oldMask)
-									) then
-									prototype = upgrade
-								end
+			if prototype and not alteredPrototypes[prototype.name] then
+				-- ignore nonexistent prototypes and ones that have already been fixed
+				prototype.collision_mask = prototype.collision_mask or maskUtil.get_default_mask(prototype.type)
+				alteredPrototypes[prototype.name] = true
+				if maskUtil.mask_contains_layer(prototype.collision_mask, "object-layer") then
+					-- check the mask is supposed to collide with objects
+					-- log("Modifying collision mask of " .. prototype.name)
+					local oldMask = table.deepcopy(prototype.collision_mask) 
+					-- the mask before it is modified; used for finding upgrades
+					maskUtil.add_layer(prototype.collision_mask, "resource-layer")
+					while prototype.next_upgrade do
+						local upgrade
+						for _, possibleUpgrade in pairs(maskUtil.collect_prototypes_with_mask(oldMask)) do
+							if (
+								possibleUpgrade.name == prototype.next_upgrade and
+								possibleUpgrade.fast_replaceable_group == prototype.fast_replaceable_group and
+								util_functions.match(possibleUpgrade.collision_box, prototype.collision_box)
+							) then
+								upgrade = possibleUpgrade
+								break
 							end
 						end
-					else
-						break
+						-- log("Replicating collision mask changes to upgrade " .. upgrade.name .. " from " .. prototype.name)
+						upgrade.collision_mask = prototype.collision_mask
+						prototype = upgrade
+						alteredPrototypes[prototype.name] = true
 					end
 				end
 			end
