@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.0.5
+Date: 2023-09-20
+  Bugfixes:
+    - Fixed a bug with collision masks preventing enemy expansion and offshore pump placement.
+    - Fixed a bug causing trees to be significantly less frequent on ore.
+---------------------------------------------------------------------------------------------------
 Version: 1.0.4
 Date: 2023-05-03
   Bugfixes:
