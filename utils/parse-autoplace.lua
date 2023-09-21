@@ -28,7 +28,7 @@ end
 local function search_table(tbl, toMatch, breadthFirst, indexTable)
   local recurse = search_table
   if type(tbl) ~= "table" or not toMatch then -- There's nothing to search, or nothing to find
-    -- if you require this and pass a table with a irresponsibly set up metatable to this function, I will not fix errors you cause.
+    -- if you require this and pass a table with an irresponsibly designed metatable to this function, I will not fix errors you cause.
     return nil
   end
   if not breadthFirst then -- depth-first search

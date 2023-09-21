@@ -68,6 +68,9 @@ log("ClaustOrephobic starting autoplace modifications.")
 for toPlace, dataToPlace in pairs(oreData) do
 	log("ClaustOrephobic modifying autoplace expressions of " .. toPlace .. "...")
 	orePrototypes[toPlace].autoplace.order = "z" -- place absolute last in generation
+	orePrototypes[toPlace].tree_removal_probability = nil -- don't remove trees on affected ores
+	orePrototypes[toPlace].tree_removal_max_distance = nil
+	--orePrototypes[toPlace].cliff_removal_probability = 0 -- Predicted cliff fix for next version. May need changes when API reference is available.
 	local target = noise.random_penalty(1, 1, { x = tne(dataToPlace.index), y = noise.var("map_seed") })
 	local regularDensityBelowTarget
 	local starterDensityBelowTarget
@@ -182,10 +185,12 @@ for toPlace, dataToPlace in pairs(oreData) do
 		(1 + (noise.clamp(noise.var("distance") - startingResourceOuterRadius, 0, math.huge) * regularInfluence) / (1300 / (relativeStarterArea ^ (1 / 3))))
 	richness = noise.max(richness, dataToPlace.minimum_richness)
 	orePrototypes[toPlace].autoplace.richness_expression = richness * probabilityExpression
+	-- orePrototypes[toPlace].autoplace.richness_expression = cliffExpression
 end
 log("Finished autoplace modifications.")
 
-local ignoredGroups = { "resource", "mining-drill" }
+local ignoredGroups = { "resource", "mining-drill", "offshore-pump" }
+local ignoredSubgroups = ClaustOrephobic.allowed_subgroups
 if settings.startup["claustorephobic-easy-mode"].value then -- Only use easy mode allowed-prototypes setting if easy mode is on
 	---@diagnostic disable-next-line: param-type-mismatch
 	for group in string.gmatch(settings.startup["claustorephobic-allowed-prototypes"].value, "%S+") do
@@ -205,7 +210,8 @@ for group, _ in pairs(ownableEntities) do
 	for _, prototype in pairs(data.raw[group]) do
 		if
 			(not util_functions.search_table(ignoredGroups, prototype.type)) and
-			(prototype.collision_mask or maskUtil.get_default_mask(group))
+			(prototype.collision_mask or maskUtil.get_default_mask(group)) and
+			(not util_functions.search_table(ignoredSubgroups, prototype.subgroup)) -- subgroup check to ignore enemies
 		then
 			-- only change prototypes that aren't excluded via easy-mode or initial list
 			if prototype and not alteredPrototypes[prototype.name] then
@@ -240,4 +246,5 @@ for group, _ in pairs(ownableEntities) do
 		end
 	end
 end
+
 log("Finished collision mask modifications.")
