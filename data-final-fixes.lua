@@ -70,7 +70,7 @@ for toPlace, dataToPlace in pairs(oreData) do
 	orePrototypes[toPlace].autoplace.order = "z" -- place absolute last in generation
 	orePrototypes[toPlace].tree_removal_probability = nil -- don't remove trees on affected ores
 	orePrototypes[toPlace].tree_removal_max_distance = nil
-	orePrototypes[toPlace].cliff_removal_probability = 0
+	--orePrototypes[toPlace].cliff_removal_probability = 0 -- Predicted cliff fix for next version. May need changes when API reference is available.
 	local target = noise.random_penalty(1, 1, { x = tne(dataToPlace.index), y = noise.var("map_seed") })
 	local regularDensityBelowTarget
 	local starterDensityBelowTarget
@@ -224,7 +224,7 @@ for group, _ in pairs(ownableEntities) do
 					local oldMask = table.deepcopy(prototype.collision_mask) 
 					-- the mask before it is modified; used for finding upgrades
 					maskUtil.add_layer(prototype.collision_mask, "resource-layer")
-					while prototype.next_upgrade and not alteredPrototypes[prototype.next_upgrade] do
+					while prototype.next_upgrade do
 						local upgrade
 						for _, possibleUpgrade in pairs(maskUtil.collect_prototypes_with_mask(oldMask)) do
 							if (
