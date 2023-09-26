@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.1.0
+Date: 2023-09-20
+  Info:
+    - ClaustOrephobic now requires Factorio 1.1.92 or above due to dependency upon ResourceEntityPrototype::cliff_removal_probability
+  Bugfixes:
+    - Ores will now no longer obstruct cliff spawns.
+---------------------------------------------------------------------------------------------------
 Version: 1.0.5
 Date: 2023-09-20
   Bugfixes:

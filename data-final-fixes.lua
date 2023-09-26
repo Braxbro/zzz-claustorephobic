@@ -70,7 +70,7 @@ for toPlace, dataToPlace in pairs(oreData) do
 	orePrototypes[toPlace].autoplace.order = "z" -- place absolute last in generation
 	orePrototypes[toPlace].tree_removal_probability = nil -- don't remove trees on affected ores
 	orePrototypes[toPlace].tree_removal_max_distance = nil
-	--orePrototypes[toPlace].cliff_removal_probability = 0 -- Predicted cliff fix for next version. May need changes when API reference is available.
+	orePrototypes[toPlace].cliff_removal_probability = 0
 	local target = noise.random_penalty(1, 1, { x = tne(dataToPlace.index), y = noise.var("map_seed") })
 	local regularDensityBelowTarget
 	local starterDensityBelowTarget
