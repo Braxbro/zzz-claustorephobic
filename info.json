@@ -3,7 +3,7 @@
 	"version": "1.1.0",
 	"title": "ClaustOrephobic",
 	"author": "Braxbro",
-	"factorio_version": "1.1",
+	"factorio_version": "1.1.92",
 	"description": "A purely data-stage implementation of dangOreous-esque gameplay that supports map preview and (most) mods.",
 	"dependencies": [
 		"! space-exploration",
