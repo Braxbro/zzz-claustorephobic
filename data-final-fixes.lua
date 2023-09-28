@@ -17,7 +17,15 @@ for resourceName, prototype in pairs(resources) do
 			i = (i or 0) + 1
 			orePrototypes[resourceName] = prototype
 			oreData[resourceName] = util_functions.find_autoplace_argument("all", prototype.autoplace)
-			if oreData[resourceName].base_density == "unfound" then
+			local isInvalid
+			if oreData[resourceName].starter_patch_metaset == "unfound" then -- ignore if it can't find starter patch metasets.
+				oreData[resourceName].starter_patch_metaset = nil
+				isInvalid = util_functions.search_table(oreData[resourceName], "unfound")
+				oreData[resourceName].starter_patch_metaset = "unfound"
+			else
+				isInvalid = util_functions.search_table(oreData[resourceName], "unfound")
+			end
+			if isInvalid then
 				-- if another mod is messing with ore gen in a way that this mod can't parse,
 				-- exclude affected ores from this mod's modifications; otherwise, finish setup
 				oreData[resourceName] = nil
@@ -170,8 +178,41 @@ for toPlace, dataToPlace in pairs(oreData) do
 	-- but this ensures no ores can be placed in the starting area where they don't belong, and that no gap is left behind
 	expression = aboveMin - aboveMax
 	expression = expression * noise.less_or_equal(startingResourceInnerRadius, noise.var("distance"))
-	orePrototypes[toPlace].autoplace.probability_expression = expression
+	
+	local probabilityTarget = oreData[toPlace].random_probability == 1 and {
+		function_name = "multiply",
+		source_location = {
+		filename = "__core__/lualib/resource-autoplace.lua",
+		line_number = 377
+		},
+		type = "function-application"
+	} or {
+		function_name = "clamp",
+		source_location = {
+			filename = "__core__/lualib/resource-autoplace.lua",
+			line_number = 374
+		},
+		type = "function-application"
+	}
+	local _, probabilityIndexTable = util_functions.search_table(orePrototypes[toPlace].autoplace.probability_expression, probabilityTarget)
+	if probabilityIndexTable then 
+		-- try to replace in-place for mods like bz-lead that wrap autoplaces in modifiers. 
+		-- Probably a bad idea for probability, but if I'm gonna respect nonstandard noise expressions I might as well respect probability modifications too.
+		local lastIndex, subTable
+		for _, index in pairs(probabilityIndexTable) do
+			if not lastIndex then
+				subTable = orePrototypes[toPlace].autoplace.probability_expression
+			else
+				subTable = subTable[lastIndex]
+			end
+			lastIndex = index
+		end
+		subTable[lastIndex] = expression
+	else
+		orePrototypes[toPlace].autoplace.probability_expression = expression
+	end
 	probabilityExpression = expression
+	
 	local richnessMultiplier = noise.get_control_setting(toPlace)["richness_multiplier"]
 	local rqMultiplier = dataToPlace.starting_rq_factor_multiplier +
 		(dataToPlace.regular_rq_factor_multiplier - dataToPlace.starting_rq_factor_multiplier) * regularInfluence
@@ -184,8 +225,31 @@ for toPlace, dataToPlace in pairs(oreData) do
 	richness = richness *
 		(1 + (noise.clamp(noise.var("distance") - startingResourceOuterRadius, 0, math.huge) * regularInfluence) / (1300 / (relativeStarterArea ^ (1 / 3))))
 	richness = noise.max(richness, dataToPlace.minimum_richness)
-	orePrototypes[toPlace].autoplace.richness_expression = richness * probabilityExpression
-	-- orePrototypes[toPlace].autoplace.richness_expression = cliffExpression
+
+	local richnessTarget = {
+		function_name = "multiply",
+		source_location = {
+		filename = "__core__/lualib/resource-autoplace.lua",
+		line_number = 407
+		},
+		type = "function-application"
+	}
+	local _, richnessIndexTable = util_functions.search_table(orePrototypes[toPlace].autoplace.richness_expression, richnessTarget)
+	if richnessIndexTable then 
+		-- try to replace in-place for mods like bz-lead that wrap autoplaces in modifiers.
+		local lastIndex, subTable
+		for _, index in pairs(richnessIndexTable) do
+			if not lastIndex then
+				subTable = orePrototypes[toPlace].autoplace.richness_expression
+			else
+				subTable = subTable[lastIndex]
+			end
+			lastIndex = index
+		end
+		subTable[lastIndex] = richness * probabilityExpression
+	else
+		orePrototypes[toPlace].autoplace.richness_expression = richness * probabilityExpression
+	end
 end
 log("Finished autoplace modifications.")
 
@@ -224,7 +288,7 @@ for group, _ in pairs(ownableEntities) do
 					local oldMask = table.deepcopy(prototype.collision_mask) 
 					-- the mask before it is modified; used for finding upgrades
 					maskUtil.add_layer(prototype.collision_mask, "resource-layer")
-					while prototype.next_upgrade do
+					while prototype.next_upgrade and not alteredPrototypes[prototype.next_upgrade] do
 						local upgrade
 						for _, possibleUpgrade in pairs(maskUtil.collect_prototypes_with_mask(oldMask)) do
 							if (

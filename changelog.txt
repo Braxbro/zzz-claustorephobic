@@ -1,10 +1,20 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.1.1
+Date: 2023-09-28
+  Locale:
+    - Updated changelog for v1.1.0 to better reflect the state of the mod in that version.
+  Bugfixes:
+    - Fixed a bug causing a crash when ClaustOrephobic modified an upgraded prototype before its predecessor.
+  Modding:
+    - ClaustOrephobic can now parse resource-autoplace.lua expressions found in other mods more reliably, even after they've been multiplied, clamped, etc. by another mod.
+      As long as the resource-autoplace.lua expression is intact, ClaustOrephobic will find it and replace it in-place now, preserving the other mod's modifications.
+    - Error handling has been improved; now invalid ores should be more reliably excluded, and more modded ores should be valid.
+---------------------------------------------------------------------------------------------------
 Version: 1.1.0
 Date: 2023-09-26
-  Info:
-    - ClaustOrephobic now requires Factorio 1.1.92 or above due to dependency upon ResourceEntityPrototype::cliff_removal_probability
   Bugfixes:
-    - Ores will now no longer obstruct cliff spawns.
+    - Ores will now no longer obstruct cliff spawns. Requires v1.1.92 due to dependency upon ResourceEntity::cliff_removal_probability.
+      The mod will still load on v1.1.91, just without the cliff fixes.
 ---------------------------------------------------------------------------------------------------
 Version: 1.0.5
 Date: 2023-09-20

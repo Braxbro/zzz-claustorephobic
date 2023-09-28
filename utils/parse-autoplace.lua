@@ -94,10 +94,26 @@ local function find_autoplace_argument(argument, autoplace, breadthFirst)
   autoplace.richness_expression = autoplace.richness_expression or {}
   autoplace.richness_expression.source_location = autoplace.richness_expression.source_location or {}
   local searchable_expressions = {} -- catch overridden/manually specified expressions
-  if autoplace.probability_expression.source_location.filename == "__core__/lualib/resource-autoplace.lua" then
+  local probabilityTarget = {
+    function_name = "clamp",
+    source_location = {
+      filename = "__core__/lualib/resource-autoplace.lua",
+      line_number = 374
+    },
+    type = "function-application"
+  }
+  if search_table(autoplace.probability_expression, probabilityTarget) then
     table.insert(searchable_expressions, "probability_expression")
   end
-  if autoplace.richness_expression.source_location.filename == "__core__/lualib/resource-autoplace.lua" then
+  local richnessTarget = {
+    function_name = "multiply",
+    source_location = {
+    filename = "__core__/lualib/resource-autoplace.lua",
+    line_number = 407
+    },
+    type = "function-application"
+  }
+  if search_table(autoplace.richness_expression, richnessTarget) then
     table.insert(searchable_expressions, "richness_expression")
   end
   local direct_indexes = {}
