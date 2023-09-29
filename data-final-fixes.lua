@@ -1,4 +1,6 @@
 local util_functions = require("utils.parse-autoplace")
+local maskUtil = require("collision-mask-util")
+local claustorephobicLayer = maskUtil.get_first_unused_layer()
 
 local resources = data.raw["resource"]
 
@@ -11,6 +13,8 @@ local i
 for resourceName, prototype in pairs(resources) do
 	if prototype.autoplace then
 		-- log(serpent.block(prototype.autoplace, {refcomment = true}))
+		prototype.collision_mask = table.deepcopy(maskUtil.get_mask(prototype))
+		maskUtil.add_layer(prototype.collision_mask, claustorephobicLayer)
 		local bBox = prototype.collision_box
 		local longestDimension = math.max(bBox[2][1] - bBox[1][1], bBox[2][2] - bBox[1][2])
 		if longestDimension <= 1 then -- if it's a nondisabled ore
@@ -253,7 +257,7 @@ for toPlace, dataToPlace in pairs(oreData) do
 end
 log("Finished autoplace modifications.")
 
-local ignoredGroups = { "resource", "mining-drill", "offshore-pump" }
+local ignoredGroups = { "resource", "mining-drill" }
 local ignoredSubgroups = ClaustOrephobic.allowed_subgroups
 if settings.startup["claustorephobic-easy-mode"].value then -- Only use easy mode allowed-prototypes setting if easy mode is on
 	---@diagnostic disable-next-line: param-type-mismatch
@@ -265,7 +269,6 @@ if settings.startup["claustorephobic-easy-mode"].value then -- Only use easy mod
 	end
 end
 
-local maskUtil = require("collision-mask-util")
 local ownableEntities = require("utils.data.entities-with-owners") -- list of entityWithOwners
 local alteredPrototypes = {}
 
@@ -280,14 +283,14 @@ for group, _ in pairs(ownableEntities) do
 			-- only change prototypes that aren't excluded via easy-mode or initial list
 			if prototype and not alteredPrototypes[prototype.name] then
 				-- ignore nonexistent prototypes and ones that have already been fixed
-				prototype.collision_mask = prototype.collision_mask or maskUtil.get_default_mask(prototype.type)
+				prototype.collision_mask = maskUtil.get_mask(prototype)
 				alteredPrototypes[prototype.name] = true
 				if maskUtil.mask_contains_layer(prototype.collision_mask, "object-layer") then
 					-- check the mask is supposed to collide with objects
 					-- log("Modifying collision mask of " .. prototype.name)
 					local oldMask = table.deepcopy(prototype.collision_mask) 
 					-- the mask before it is modified; used for finding upgrades
-					maskUtil.add_layer(prototype.collision_mask, "resource-layer")
+					maskUtil.add_layer(prototype.collision_mask, claustorephobicLayer)
 					while prototype.next_upgrade and not alteredPrototypes[prototype.next_upgrade] do
 						local upgrade
 						for _, possibleUpgrade in pairs(maskUtil.collect_prototypes_with_mask(oldMask)) do

@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.1.2
+Date: 2023-09-28
+  Bugfixes:
+    - Water no longer improperly collides with modded entities.
+      ClaustOrephobic now uses its own collision layer for the mod's placement restrictions.
+---------------------------------------------------------------------------------------------------
 Version: 1.1.1
 Date: 2023-09-28
   Locale:
