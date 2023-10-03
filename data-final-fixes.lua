@@ -43,12 +43,20 @@ for resourceName, prototype in pairs(resources) do
 		end
 	end
 end
+
+for group, prototypes in pairs(data.raw) do
+	if group ~= "resource" then
+		for _, prototype in pairs(prototypes) do
+			if prototype.selection_priority and prototype.selection_priority <= 49 then
+				prototype.selection_priority = prototype.selection_priority > 0 and prototype.selection_priority - 1 or 0 -- knock everything at 49 or lower down a priority to maintain consistency
+			end
+		end
+	end
+end
 log("Autoplace dump complete.")
 
-local startingResourceInnerRadius = settings.startup["claustorephobic-starting-radius"]
-.value                                                                                        -- the radius that will not be initially covered by ore
-local startingResourceOuterRadius = math.sqrt(2) *
-startingResourceInnerRadius                                                                   -- the radius in which starter placement has full influence
+local startingResourceInnerRadius = settings.startup["claustorephobic-starting-radius"].value -- the radius that will not be initially covered by ore
+local startingResourceOuterRadius = math.sqrt(2) * startingResourceInnerRadius -- the radius in which starter placement has full influence
 local regularResourceRadius = math.sqrt(4 * (2 * math.pow(startingResourceOuterRadius, 2) -
 	---@diagnostic disable-next-line: param-type-mismatch
 	math.pow(startingResourceInnerRadius, 2)))
