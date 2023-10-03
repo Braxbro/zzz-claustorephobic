@@ -317,6 +317,9 @@ for group, _ in pairs(ownableEntities) do
 						prototype = upgrade
 						alteredPrototypes[prototype.name] = true
 					end
+					if prototype.next_upgrade == "" then
+						log("Prototype " .. prototype.name .. " has an empty string for its next_upgrade property. This property is optional and should be nil if there is no next_upgrade.")
+					end
 				end
 			end
 		end
