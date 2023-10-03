@@ -300,7 +300,7 @@ for group, _ in pairs(ownableEntities) do
 					local oldMask = table.deepcopy(prototype.collision_mask) 
 					-- the mask before it is modified; used for finding upgrades
 					maskUtil.add_layer(prototype.collision_mask, claustorephobicLayer)
-					while prototype.next_upgrade and not alteredPrototypes[prototype.next_upgrade] do
+					while prototype.next_upgrade and prototype.next_upgrade ~= "" and not alteredPrototypes[prototype.next_upgrade] do
 						local upgrade
 						for _, possibleUpgrade in pairs(maskUtil.collect_prototypes_with_mask(oldMask)) do
 							if (
