@@ -14,6 +14,7 @@ for resourceName, prototype in pairs(resources) do
 	if prototype.autoplace then
 		-- log(serpent.block(prototype.autoplace, {refcomment = true}))
 		prototype.collision_mask = table.deepcopy(maskUtil.get_mask(prototype))
+		prototype.selection_priority = 49 -- one lower than standard building priority, one higher than artillery remote entities priority
 		maskUtil.add_layer(prototype.collision_mask, claustorephobicLayer)
 		local bBox = prototype.collision_box
 		local longestDimension = math.max(bBox[2][1] - bBox[1][1], bBox[2][2] - bBox[1][2])
