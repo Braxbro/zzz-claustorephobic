@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 1.1.3
-Date: 2023-09-28
+Date: 2023-10-02
   Bugfixes:
     - Fix selection priority for resources.
     - Fix crash with mods that leave empty strings in Entity::next_upgrade as an empty string, rather than setting it to nil.
