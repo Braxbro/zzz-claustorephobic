@@ -55,6 +55,24 @@ for group, prototypes in pairs(data.raw) do
 end
 log("Autoplace dump complete.")
 
+local startingAreaShapes = {} --[[
+	Table of tables of four values in order, indexed numerically:
+	x - The effective x position function
+	y - The effective y position function
+	distance - the effective distance function
+	theta - How far around the perimeter of the shape with a radius equal to distance is, from 0 to 1
+]]
+startingAreaShapes["circle"] = {noise.var("x"), noise.var("y"), noise.var("distance"), ((noise.atan2(noise.var("y"), noise.var("x")) / (math.pi)) + 1) / 2} -- circle
+do -- square
+	local x, y, distance, theta
+	distance = noise.if_else_chain(noise.less_or_equal(noise.absolute_value(noise.var("x")), noise.absolute_value(noise.var("y"))), noise.absolute_value(noise.var("y")), noise.absolute_value(noise.var("x")))
+	theta = ((noise.atan2(noise.var("y"), noise.var("x")) / (math.pi)) + 1) / 2
+	x = noise.cos(theta * 2 * math.pi) * distance
+	y = noise.sin(theta * 2 * math.pi) * distance
+	startingAreaShapes["square"] = {x, y, distance, theta}
+end
+local x, y, distance, theta = table.unpack(startingAreaShapes[settings.startup["claustorephobic-starting-area-shape"].value])
+
 local startingResourceInnerRadius = settings.startup["claustorephobic-starting-radius"].value -- the radius that will not be initially covered by ore
 local startingResourceOuterRadius = math.sqrt(2) * startingResourceInnerRadius -- the radius in which starter placement has full influence
 local regularResourceRadius = math.sqrt(4 * (2 * math.pow(startingResourceOuterRadius, 2) -
@@ -62,7 +80,7 @@ local regularResourceRadius = math.sqrt(4 * (2 * math.pow(startingResourceOuterR
 	math.pow(startingResourceInnerRadius, 2)))
 -- the radius beyond which regular placement has full influence; between this and startingResourceOuterRadius, placement is interpolated
 
-local regularInfluence = (noise.var("distance") - startingResourceOuterRadius) /
+local regularInfluence = (distance - startingResourceOuterRadius) /
 	(regularResourceRadius - startingResourceOuterRadius)
 regularInfluence = noise.delimit_procedure(noise.clamp(regularInfluence, 0, 1, noise.csloc(0)))
 
@@ -124,11 +142,11 @@ for toPlace, dataToPlace in pairs(oreData) do
 		expression = 1 - noise.random(1) -- random between [0 and 1)
 	end
 	if settings.startup["claustorephobic-ore-generation-mode"].value == "pie" or settings.startup["claustorephobic-ore-generation-mode"].value == "spiral" then
-		expression = ((noise.atan2(noise.var("y"), noise.var("x")) / (math.pi)) + 1) / 2
+		expression = theta
 		if settings.startup["claustorephobic-ore-generation-mode"].value == "spiral" then
 			expression = noise.fmod(
 				expression +
-				noise.clamp((noise.var("distance") - startingResourceInnerRadius) / (startingResourceInnerRadius * 20), 0,
+				noise.clamp((distance - startingResourceInnerRadius) / (startingResourceInnerRadius * 20), 0,
 					math.huge),
 				1
 			)
@@ -137,8 +155,8 @@ for toPlace, dataToPlace in pairs(oreData) do
 	if settings.startup["claustorephobic-ore-generation-mode"].value == "noise" then
 		expression = noise.function_application("factorio-quick-multioctave-noise",
 			{
-				x = noise.var("x") + 1 / 257 * noise.var("distance") / noise.absolute_value(noise.var("distance")),
-				y = noise.var("y") + 1 / 257 * noise.var("distance") / noise.absolute_value(noise.var("distance")),
+				x = x + 1 / 257 * distance / noise.absolute_value(distance),
+				y = y + 1 / 257 * distance / noise.absolute_value(distance),
 				seed0 = noise.var("map_seed"),
 				seed1 = 100,
 				input_scale = 1 / 256,
@@ -190,7 +208,7 @@ for toPlace, dataToPlace in pairs(oreData) do
 	) -- the above shouldn't have any actual effect on ore distribution, as 'expression' ranges from [0,totalDensity)
 	-- but this ensures no ores can be placed in the starting area where they don't belong, and that no gap is left behind
 	expression = aboveMin - aboveMax
-	expression = expression * noise.less_or_equal(startingResourceInnerRadius, noise.var("distance"))
+	expression = expression * noise.less_or_equal(startingResourceInnerRadius, distance)
 	
 	local probabilityTarget = oreData[toPlace].random_probability == 1 and {
 		function_name = "multiply",
@@ -236,7 +254,7 @@ for toPlace, dataToPlace in pairs(oreData) do
 	-- turns out, adjusting adjusted_density according to distribution equals totaldensity...
 	richness = richness * richnessMultiplier * dataToPlace.richness_post_multiplier
 	richness = richness *
-		(1 + (noise.clamp(noise.var("distance") - startingResourceOuterRadius, 0, math.huge) * regularInfluence) / (1300 / (relativeStarterArea ^ (1 / 3))))
+		(1 + (noise.clamp(distance - startingResourceOuterRadius, 0, math.huge) * regularInfluence) / (1300 / (relativeStarterArea ^ (1 / 3))))
 	richness = noise.max(richness, dataToPlace.minimum_richness)
 
 	local richnessTarget = {

@@ -17,6 +17,14 @@ data:extend({
         maximum_value = 300,
         order = "02"
 	},
+	{
+		type = "string-setting",
+		name = "claustorephobic-starting-area-shape",
+		setting_type = "startup",
+		default_value = "circle",
+		allowed_values = {"circle", "square"},
+		order = "03"
+	},
 	-- restriction settings
 	{
 		type = "bool-setting",
