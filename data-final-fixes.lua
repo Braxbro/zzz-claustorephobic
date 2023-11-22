@@ -62,10 +62,15 @@ local startingAreaShapes = {} --[[
 	distance - the effective distance function
 	theta - How far around the perimeter of the shape with a radius equal to distance is, from 0 to 1
 ]]
-startingAreaShapes["circle"] = {noise.var("x"), noise.var("y"), noise.var("distance"), ((noise.atan2(noise.var("y"), noise.var("x")) / (math.pi)) + 1) / 2} -- circle
+startingAreaShapes["circle"] = {
+	noise.var("x"),
+	noise.var("y"),
+	(noise.absolute_value(noise.var("x") + noise.less_than(noise.var("x"), 0)) ^ 2 + noise.absolute_value(noise.var("y") + noise.less_than(noise.var("y"), 0)) ^ 2) ^ .5 + 1, -- ugly rewrite of distance to use nearest corner
+	((noise.atan2(noise.var("y"), noise.var("x")) / (math.pi)) + 1) / 2
+} -- circle
 do -- square
 	local x, y, distance, theta
-	distance = noise.if_else_chain(noise.less_or_equal(noise.absolute_value(noise.var("x")), noise.absolute_value(noise.var("y"))), noise.absolute_value(noise.var("y")), noise.absolute_value(noise.var("x")))
+	distance = noise.max(noise.absolute_value(noise.var("x")) - noise.less_than(noise.var("x"), 0), noise.absolute_value(noise.var("y")) - noise.less_than(noise.var("y"), 0))
 	theta = ((noise.atan2(noise.var("y"), noise.var("x")) / (math.pi)) + 1) / 2
 	x = noise.cos(theta * 2 * math.pi) * distance
 	y = noise.sin(theta * 2 * math.pi) * distance
