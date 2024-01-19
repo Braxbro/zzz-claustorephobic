@@ -318,15 +318,15 @@ end
 local ignoredGroups = { "resource", "mining-drill" }
 local ignoredSubgroups = ClaustOrephobic.allowed_subgroups
 local ignoredEntities = ClaustOrephobic.allowed_entity_names
+for _, group in pairs(ClaustOrephobic.allowed_types) do
+	log("Ignoring all " .. group .. " prototypes...")
+	if not util_functions.search_table(ignoredGroups, group) then
+		table.insert(ignoredGroups, group)
+	end
+end
 if settings.startup["claustorephobic-easy-mode"].value then -- Only use easy mode allowed-prototypes setting if easy mode is on
 	---@diagnostic disable-next-line: param-type-mismatch
 	for group in string.gmatch(settings.startup["claustorephobic-allowed-prototypes"].value, "%S+") do
-		log("Ignoring all " .. group .. " prototypes...")
-		if not util_functions.search_table(ignoredGroups, group) then
-			table.insert(ignoredGroups, group)
-		end
-	end
-	for _, group in ClaustOrephobic.allowed_types do
 		log("Ignoring all " .. group .. " prototypes...")
 		if not util_functions.search_table(ignoredGroups, group) then
 			table.insert(ignoredGroups, group)
