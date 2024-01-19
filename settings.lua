@@ -39,5 +39,5 @@ data:extend({
 		setting_type = "startup",
 		default_value = "inserter transport-belt splitter underground-belt electric-pole pipe pipe-to-ground pump container logistic-container storage-tank offshore-pump wall gate",
 		order = "11"
-	}
+	},
 })

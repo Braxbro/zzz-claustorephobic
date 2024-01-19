@@ -1,5 +1,15 @@
 local util_functions = require("utils.parse-autoplace")
 local maskUtil = require("collision-mask-util")
+
+local integrations = {["exotic-industries"] = "integrations.data-final-fixes.exotic-industries"} -- explicit mod integration scripts. If the mod is present, the path will be replaced with the script's output; otherwise, it will be deleted.
+for mod, path in pairs(integrations) do
+	if mods[mod] then
+		integrations[mod] = require(path)
+	else
+		integrations[mod] = nil
+	end
+end
+
 local claustorephobicLayer = maskUtil.get_first_unused_layer()
 
 local resources = data.raw["resource"]
@@ -289,11 +299,34 @@ for toPlace, dataToPlace in pairs(oreData) do
 end
 log("Finished autoplace modifications.")
 
+for index, value in pairs(ClaustOrephobic.allowed_subgroups) do -- cleanup invalid entries in global table
+    if type(value) ~= "string" then
+        ClaustOrephobic.allowed_subgroups[index] = nil -- delete invalid entry
+    end
+end
+for index, value in pairs(ClaustOrephobic.allowed_types) do
+    if type(value) ~= "string" then
+        ClaustOrephobic.allowed_types[index] = nil -- delete invalid entry
+    end
+end
+for index, value in pairs(ClaustOrephobic.allowed_entity_names) do
+    if type(value) ~= "string" then
+        ClaustOrephobic.allowed_entity_names[index] = nil -- delete invalid entry
+    end
+end
+
 local ignoredGroups = { "resource", "mining-drill" }
 local ignoredSubgroups = ClaustOrephobic.allowed_subgroups
+local ignoredEntities = ClaustOrephobic.allowed_entity_names
 if settings.startup["claustorephobic-easy-mode"].value then -- Only use easy mode allowed-prototypes setting if easy mode is on
 	---@diagnostic disable-next-line: param-type-mismatch
 	for group in string.gmatch(settings.startup["claustorephobic-allowed-prototypes"].value, "%S+") do
+		log("Ignoring all " .. group .. " prototypes...")
+		if not util_functions.search_table(ignoredGroups, group) then
+			table.insert(ignoredGroups, group)
+		end
+	end
+	for _, group in ClaustOrephobic.allowed_types do
 		log("Ignoring all " .. group .. " prototypes...")
 		if not util_functions.search_table(ignoredGroups, group) then
 			table.insert(ignoredGroups, group)
@@ -307,10 +340,18 @@ local alteredPrototypes = {}
 log("ClaustOrephobic starting modification of collision masks.")
 for group, _ in pairs(ownableEntities) do
 	for _, prototype in pairs(data.raw[group]) do
+		local isPlaceable = false
+		for _, item in pairs(data.raw.item) do
+			if item.place_result == prototype.name then
+				isPlaceable = true
+			end
+		end
 		if
 			(not util_functions.search_table(ignoredGroups, prototype.type)) and
-			(prototype.collision_mask or maskUtil.get_default_mask(group)) and
-			(not util_functions.search_table(ignoredSubgroups, prototype.subgroup)) -- subgroup check to ignore enemies
+			(prototype.collision_mask or maskUtil.get_default_mask(group)) and -- ensure it's supposed to collide with things
+			(not util_functions.search_table(ignoredSubgroups, prototype.subgroup)) and -- subgroup check to ignore enemies
+			(not util_functions.search_table(ignoredEntities, prototype.name)) and -- entity id check to protect explicitly excluded stuff
+			isPlaceable -- Don't add collision restrictions to things you can't place.
 		then
 			-- only change prototypes that aren't excluded via easy-mode or initial list
 			if prototype and not alteredPrototypes[prototype.name] then
@@ -319,7 +360,7 @@ for group, _ in pairs(ownableEntities) do
 				alteredPrototypes[prototype.name] = true
 				if maskUtil.mask_contains_layer(prototype.collision_mask, "object-layer") then
 					-- check the mask is supposed to collide with objects
-					-- log("Modifying collision mask of " .. prototype.name)
+					log("Modifying collision mask of " .. prototype.name)
 					local oldMask = table.deepcopy(prototype.collision_mask) 
 					-- the mask before it is modified; used for finding upgrades
 					maskUtil.add_layer(prototype.collision_mask, claustorephobicLayer)
@@ -335,7 +376,7 @@ for group, _ in pairs(ownableEntities) do
 								break
 							end
 						end
-						-- log("Replicating collision mask changes to upgrade " .. upgrade.name .. " from " .. prototype.name)
+						log("Replicating collision mask changes to upgrade " .. upgrade.name .. " from " .. prototype.name)
 						upgrade.collision_mask = prototype.collision_mask
 						prototype = upgrade
 						alteredPrototypes[prototype.name] = true

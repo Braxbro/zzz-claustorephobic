@@ -1,12 +1,14 @@
 {
 	"name": "zzz-claustorephobic",
-	"version": "1.1.5",
+	"version": "1.1.6",
 	"title": "ClaustOrephobic",
 	"author": "Braxbro",
 	"factorio_version": "1.1",
 	"description": "A purely data-stage implementation of dangOreous-esque gameplay that supports map preview and (most) mods.",
 	"dependencies": [
 		"! space-exploration",
-		"! rso-mod"
+		"! rso-mod",
+		"(?) exotic-industries-loaders",
+		"(?) exotic-industries"
 	]
 }

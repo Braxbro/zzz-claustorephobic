@@ -1,4 +1,15 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.1.6
+Date: 2024-1-19
+  Bugfixes:
+    - Fixed incompatibility with Exotic Industries: Loaders.
+    - Fixed incompatibility with Exotic Industries.
+  Modding:
+    - Improved data stage interface for other mods.
+      Other mods can now use ClaustOrephobic.allowed_subgroups, ClaustOrephobic.allowed_types, and ClaustOrephobic.allowed_entity_names to exclude non-resource entities from collision modification by subgroup, prototype type, and name, respectively.
+      This global is not guaranteed to be present during data.lua, but is guaranteed during data-updates.lua, and if you load before ClaustOrephobic, data-final-fixes.lua. 
+      If you wish to use it before it is exposed, see ClaustOrephobic's data.lua for more information.
+---------------------------------------------------------------------------------------------------
 Version: 1.1.5
 Date: 2023-11-22
   Bugfixes:
