@@ -1,15 +1,6 @@
 local util_functions = require("utils.parse-autoplace")
 local maskUtil = require("collision-mask-util")
 
-local integrations = {["exotic-industries"] = "integrations.data-final-fixes.exotic-industries"} -- explicit mod integration scripts. If the mod is present, the path will be replaced with the script's output; otherwise, it will be deleted.
-for mod, path in pairs(integrations) do
-	if mods[mod] then
-		integrations[mod] = require(path)
-	else
-		integrations[mod] = nil
-	end
-end
-
 local claustorephobicLayer = maskUtil.get_first_unused_layer()
 
 local resources = data.raw["resource"]

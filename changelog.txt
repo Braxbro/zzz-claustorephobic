@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.1.7
+Date: 2024-1-23
+  Bugfixes:
+    - Fixed being unable to blueprint Exotic Industries' Gate entities. (This was caused by a temporary fix in 1.1.6 that is no longer necessary, and has been removed as of Exotic Industries 0.5.8.)
+---------------------------------------------------------------------------------------------------
 Version: 1.1.6
 Date: 2024-1-19
   Bugfixes:
