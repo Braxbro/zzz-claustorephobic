@@ -250,7 +250,7 @@ for toPlace, dataToPlace in pairs(oreData) do
 	end
 	probabilityExpression = expression
 	
-	local richnessMultiplier = noise.get_control_setting(toPlace)["richness_multiplier"]
+	local richnessMultiplier = noise.get_control_setting(toPlace)["richness_multiplier"] * settings.startup["claustorephobic-resource-multiplier"].value
 	local rqMultiplier = dataToPlace.starting_rq_factor_multiplier +
 		(dataToPlace.regular_rq_factor_multiplier - dataToPlace.starting_rq_factor_multiplier) * regularInfluence
 	rqMultiplier = rqMultiplier * (adjustedDensity[toPlace] / dataToPlace.base_density) ^ (1 / 3)

@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.1.8
+Date: 2024-3-14
+  Minor Features:
+    - Added new setting for adjusting overall resource richness. This setting is 1 (no effect) by default, and may range between .001 and 1000.
+---------------------------------------------------------------------------------------------------
 Version: 1.1.7
 Date: 2024-1-23
   Bugfixes:

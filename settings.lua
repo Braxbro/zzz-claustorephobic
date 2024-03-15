@@ -25,6 +25,15 @@ data:extend({
 		allowed_values = {"circle", "square"},
 		order = "03"
 	},
+	{
+		type = "double-setting",
+		name = "claustorephobic-resource-multiplier",
+		setting_type = "startup",
+		default_value = 1.0,
+		minimum_value = 0.001,
+		maximum_value = 1000,
+		order = "04"
+	},
 	-- restriction settings
 	{
 		type = "bool-setting",
@@ -39,5 +48,5 @@ data:extend({
 		setting_type = "startup",
 		default_value = "inserter transport-belt splitter underground-belt electric-pole pipe pipe-to-ground pump container logistic-container storage-tank offshore-pump wall gate",
 		order = "11"
-	},
+	}
 })
