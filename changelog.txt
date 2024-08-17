@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.1.9
+Date: ???
+  Bugfixes:
+    - Fixed crash when the prototype and the next_upgrade collision_mask are the same table reference
+      e.g. when a mod does `prototypeA.collision_mask = prototypeB.collision_mask`
+---------------------------------------------------------------------------------------------------
 Version: 1.1.8
 Date: 2024-3-14
   Minor Features:

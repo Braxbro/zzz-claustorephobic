@@ -347,7 +347,7 @@ for group, _ in pairs(ownableEntities) do
 			-- only change prototypes that aren't excluded via easy-mode or initial list
 			if prototype and not alteredPrototypes[prototype.name] then
 				-- ignore nonexistent prototypes and ones that have already been fixed
-				prototype.collision_mask = maskUtil.get_mask(prototype)
+				prototype.collision_mask = table.deepcopy(maskUtil.get_mask(prototype))
 				alteredPrototypes[prototype.name] = true
 				if maskUtil.mask_contains_layer(prototype.collision_mask, "object-layer") then
 					-- check the mask is supposed to collide with objects
