@@ -1,3 +1,11 @@
+data:extend{{
+    type = "collision-layer"
+  , name = "claustorephobic-layer"
+}}
+
+require("prototypes.claustorephobic-controls")
+require("prototypes.claustorephobic-noise")
+
 ClaustOrephobic = type(ClaustOrephobic) == "table" and ClaustOrephobic or {} -- in case someone comes before me and wants to use my interface, I'll just run basic format checks here.
 
 --[[

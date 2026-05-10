@@ -1,4 +1,16 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.0.0
+Date: 2026-5-10
+  Info:
+    - First 2.0 release of ClaustOrephobic.
+    - Contains AI-generated code; while tested, there may be bugs and quirks.
+    - Fine-tuning patches will come in the coming months based on user feedback.
+  Major Features:
+    - All features from 1.1.x
+    - Most settings were moved from startup settings to map generator options.
+    - Added a separate slider for clearings area - frequency has no effect. When disabled, defaults to the starting radius used for enemies.
+    - Now supports resources that have multiple resource autoplace expressions in their autoplaces.
+---------------------------------------------------------------------------------------------------
 Version: 1.1.9
 Date: 2024-8-17
   Bugfixes:
