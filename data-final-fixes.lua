@@ -522,11 +522,8 @@ local CLAUST_LAYER = "claustorephobic-layer"
 for name in pairs(ore_band_conds) do
     local proto = resources[name]
     -- Collision layer: buildings can't be placed on ore.
-    if proto.collision_mask then
-        proto.collision_mask.layers[CLAUST_LAYER] = true
-    else
-        proto.collision_mask = {layers = {[CLAUST_LAYER] = true}}
-    end
+    proto.collision_mask = maskutil.get_mask(proto)
+    proto.collision_mask.layers[CLAUST_LAYER] = true
     proto.selection_priority = 49        -- one below standard building priority
     proto.autoplace.order = "z"          -- place absolute last in generation
     proto.tree_removal_probability = nil -- don't clear trees on ore spawn
