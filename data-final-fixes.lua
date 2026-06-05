@@ -573,34 +573,35 @@ end
 
 -- 4. Add collision layer to buildable entities so they can't be placed on ore.
 local ownableEntities = require("utils.data.entities-with-owners")
-local alteredPrototypes = {}
+
+local function restrict_entity(proto)
+    local recurse = restrict_entity
+    proto.collision_mask = maskutil.get_mask(proto)
+    local mask = proto.collision_mask
+    if mask and mask.layers and mask.layers["object"]
+    and placeableNames[proto.name]
+    and not ignoredSubgroups[proto.subgroup]
+    and not ignoredEntities[proto.name]
+    and not mask.altered_by_claustorephobic
+    then
+        mask.layers[CLAUST_LAYER] = true
+        mask.altered_by_claustorephobic = true
+        if proto.next_upgrade and proto.next_upgrade ~= "" then
+            recurse(data.raw[proto.type][proto.next_upgrade])
+        end
+    elseif not mask.altered_by_claustorephobic then
+        log("Allowing entity " .. proto.name)
+    end
+end
 
 log("ClaustOrephobic starting modification of collision masks.")
 for group in pairs(ownableEntities) do
     if not ignoredGroups[group] then
         for _, proto in pairs(data.raw[group] or {}) do
-            local mask = maskutil.get_mask(proto)
-            if  mask and mask.layers and mask.layers["object"]
-            and placeableNames[proto.name]
-            and not ignoredSubgroups[proto.subgroup]
-            and not ignoredEntities[proto.name]
-            and not alteredPrototypes[proto.name]
-            then
-                alteredPrototypes[proto.name] = true
-                mask.layers[CLAUST_LAYER] = true
-                -- Propagate to next_upgrade chain.
-                local current = proto
-                while current.next_upgrade and current.next_upgrade ~= "" do
-                    local next_proto = data.raw[group][current.next_upgrade]
-                    if not next_proto or alteredPrototypes[next_proto.name] then break end
-                    alteredPrototypes[next_proto.name] = true
-                    if next_proto.collision_mask and next_proto.collision_mask.layers then
-                        next_proto.collision_mask.layers[CLAUST_LAYER] = true
-                    end
-                    current = next_proto
-                end
-            end
+            restrict_entity(proto)
         end
+    else
+        log("Allowing group " .. group)
     end
 end
 log("Finished collision mask modifications.")

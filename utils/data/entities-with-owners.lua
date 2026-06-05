@@ -1,76 +1,116 @@
+local entities = {
+  "accumulator",
+  "agricultural-tower",
+  "ammo-turret",
+  "arithmetic-combinator",
+  "artillery-turret",
+  "artillery-wagon",
+  "assembling-machine",
+  "asteroid",
+  "asteroid-collector",
+  "beacon",
+  "boiler",
+  "burner-generator",
+  "capture-robot",
+  "car",
+  "cargo-bay",
+  "cargo-landing-pad",
+  "cargo-pod",
+  "cargo-wagon",
+  "character",
+  "combat-robot",
+  "constant-combinator",
+  "construction-robot",
+  "container",
+  "curved-rail-a",
+  "curved-rail-b",
+  "decider-combinator",
+  "display-panel",
+  "electric-energy-interface",
+  "electric-pole",
+  "electric-turret",
+  "elevated-curved-rail-a",
+  "elevated-curved-rail-b",
+  "elevated-half-diagonal-rail",
+  "elevated-straight-rail",
+  "fluid-turret",
+  "fluid-wagon",
+  "furnace",
+  "fusion-generator",
+  "fusion-reactor",
+  "gate",
+  "generator",
+  "half-diagonal-rail",
+  "heat-interface",
+  "heat-pipe",
+  "infinity-cargo-wagon",
+  "infinity-container",
+  "infinity-pipe",
+  "inserter",
+  "lab",
+  "lamp",
+  "land-mine",
+  "lane-splitter",
+  "legacy-curved-rail",
+  "legacy-straight-rail",
+  "lightning-attractor",
+  "linked-belt",
+  "linked-container",
+  "loader",
+  "loader-1x1",
+  "locomotive",
+  "logistic-container",
+  "logistic-robot",
+  "market",
+  "mining-drill",
+  "offshore-pump",
+  "pipe",
+  "pipe-to-ground",
+  "player-port",
+  "power-switch",
+  "programmable-speaker",
+  "proxy-container",
+  "pump",
+  "radar",
+  "rail-chain-signal",
+  "rail-ramp",
+  "rail-signal",
+  "rail-support",
+  "reactor",
+  "roboport",
+  "rocket-silo",
+  "segment",
+  "segmented-unit",
+  "selector-combinator",
+  "simple-entity-with-force",
+  "simple-entity-with-owner",
+  "solar-panel",
+  "space-platform-hub",
+  "spider-leg",
+  "spider-unit",
+  "spider-vehicle",
+  "splitter",
+  "storage-tank",
+  "straight-rail",
+  "temporary-container",
+  "thruster",
+  "train-stop",
+  "transport-belt",
+  "turret",
+  "underground-belt",
+  "unit",
+  "unit-spawner",
+  "valve",
+  "wall",
+}
+
 local tbl = {}
 local function add(key)
     tbl[key] = 0
 end
 
-add("accumulator")
-add("artillery-turret")
-add("beacon")
-add("boiler")
-add("burner-generator")
-add("arithmetic-combinator")
-add("decider-combinator")
-add("constant-combinator")
-add("container")
-add("logistic-container")
-add("infinity-container")
-add("assembling-machine")
-add("rocket-silo")
-add("furnace")
-add("electric-energy-interface")
-add("electric-pole")
-add("unit-spawner")
-add("combat-robot")
-add("construction-robot")
-add("logistic-robot")
-add("gate")
-add("generator")
-add("heat-interface")
-add("heat-pipe")
-add("inserter")
-add("lab")
-add("lamp")
-add("land-mine")
-add("linked-container")
-add("market")
-add("mining-drill")
-add("offshore-pump")
-add("pipe")
-add("infinity-pipe")
-add("pipe-to-ground")
-add("player-port")
-add("power-switch")
-add("programmable-speaker")
-add("pump")
-add("radar")
-add("curved-rail")
-add("straight-rail")
-add("rail-chain-signal")
-add("rail-signal")
-add("reactor")
-add("roboport")
-add("simple-entity-with-owner")
-add("simple-entity-with-force")
-add("solar-panel")
-add("storage-tank")
-add("train-stop")
-add("linked-belt")
-add("loader-1x1")
-add("loader")
-add("splitter")
-add("transport-belt")
-add("underground-belt")
-add("turret")
-add("ammo-turret")
-add("electric-turret")
-add("fluid-turret")
-add("unit")
-add("car")
-add("artillery-wagon")
-add("cargo-wagon")
-add("fluid-wagon")
-add("locomotive")
-add("spider-vehicle")
-add("wall")
+for _, entity in ipairs(entities) do
+  add(entity)
+end
 
 return tbl
