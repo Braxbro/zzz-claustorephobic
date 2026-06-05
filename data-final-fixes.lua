@@ -1,5 +1,11 @@
 -- TODO: clean up some of the synthetic expressions here to use local_expressions better
 
+-- not used for anything but worthwhile to keep for debugging or whatever later.
+local compat_output = {}
+for mod, version in pairs(mods) do
+    compat_output[mod .. "_" .. version] = pcall(require("compat-patches." .. mod))
+end
+
 local util_functions = require("utils.parse-autoplace")
 local maskutil = require("collision-mask-util")
 local drills = data.raw["mining-drill"]
@@ -44,7 +50,7 @@ for name, resource in pairs(resources) do
     local ap = resource.autoplace
     if ap and type(ap.probability_expression) == "string"
            and type(ap.richness_expression) == "string" then
-        local all_calls, all_exprs = util_functions.find_all_autoplace_arguments(ap, "claustorephobic_ignore")
+        local all_calls, all_exprs = util_functions.find_all_autoplace_arguments(ap, "claustorephobic_ignore", "claustorephobic_force")
         if #all_calls > 0 then
 
             -- Determine if this ore is physically eligible.
@@ -79,7 +85,11 @@ for name, resource in pairs(resources) do
                 slot_data[key].ore_exprs[name] = all_exprs[i]
                 slot_data[key].ore_params[name] = call_params
                 -- Mark slot as poisoned if ore is ineligible, unfound, or explicitly ignored.
-                if not eligible or call_params.base_density == "unfound" or call_params.ignored then
+                -- Exception: forced ores bypass eligibility checks.
+                if call_params.forced then
+                    -- forced ore: always include, clear ignore flag
+                    call_params.ignored = false
+                elseif not eligible or call_params.base_density == "unfound" or call_params.ignored then
                     poisoned[key] = true
                 end
             end
@@ -524,24 +534,10 @@ for name in pairs(ore_band_conds) do
     -- Collision layer: buildings can't be placed on ore.
     proto.collision_mask = maskutil.get_mask(proto)
     proto.collision_mask.layers[CLAUST_LAYER] = true
-    proto.selection_priority = 49        -- one below standard building priority
     proto.autoplace.order = "z"          -- place absolute last in generation
     proto.tree_removal_probability = nil -- don't clear trees on ore spawn
     proto.tree_removal_max_distance = nil
     proto.cliff_removal_probability = 0  -- don't clear cliffs on ore spawn
-end
-
--- 2. Bump down selection_priority of non-resource prototypes that are <= 49,
---    so ores stay selectable over them.
-for group, prototypes in pairs(data.raw) do
-    if group ~= "resource" then
-        for _, proto in pairs(prototypes) do
-            if proto.selection_priority and proto.selection_priority <= 49 then
-                proto.selection_priority = proto.selection_priority > 0
-                    and proto.selection_priority - 1 or 0
-            end
-        end
-    end
 end
 
 -- 3. Re-validate ClaustOrephobic API table after data-updates (other mods may
@@ -583,7 +579,7 @@ log("ClaustOrephobic starting modification of collision masks.")
 for group in pairs(ownableEntities) do
     if not ignoredGroups[group] then
         for _, proto in pairs(data.raw[group] or {}) do
-            local mask = proto.collision_mask
+            local mask = maskutil.get_mask(proto)
             if  mask and mask.layers and mask.layers["object"]
             and placeableNames[proto.name]
             and not ignoredSubgroups[proto.subgroup]

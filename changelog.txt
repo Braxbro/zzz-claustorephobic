@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.0.2
+Date: 2026-6-5
+  Bugfixes:
+    - Fixed a collision mask application error that allowed free placement on ore.
+    - Fixed nexelit not being considered valid.
+    - Fixed a selection priority issue preventing belts on ore from being minable.
+---------------------------------------------------------------------------------------------------
 Version: 2.0.1
 Date: 2026-5-13
   Bugfixes:

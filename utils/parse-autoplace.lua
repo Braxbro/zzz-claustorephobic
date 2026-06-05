@@ -420,43 +420,48 @@ local function find_all_calls(node, name, stop_fn, out)
   return out
 end
 
--- Like find_all_calls but also searches inside stop_fn calls and flags them.
--- Returns list of {call, ignored=bool} where ignored is true if inside stop_fn.
-local function find_all_calls_including_ignored(node, name, stop_fn)
+-- Like find_all_calls but also searches inside stop_fn/force_fn calls and flags them.
+-- Returns list of {call, ignored=bool, forced=bool} where ignored/forced are true if inside respective fn.
+local function find_all_calls_including_ignored(node, name, stop_fn, force_fn)
   local recurse
   if stop_fn and data and data.raw then
     assert(is_noop_fn(stop_fn), "find_all_calls_including_ignored: stop_fn '" .. stop_fn .. "' is not a verified no-op noise-function")
   end
+  if force_fn and data and data.raw then
+    assert(is_noop_fn(force_fn), "find_all_calls_including_ignored: force_fn '" .. force_fn .. "' is not a verified no-op noise-function")
+  end
   local out = {}
 
-  recurse = function(n, inside_stop_fn)
+  recurse = function(n, inside_stop_fn, inside_force_fn)
     if not n or type(n) ~= "table" then return end
     if n.type == "call_named" or n.type == "call_positional" then
       if n.name == name then
-        out[#out + 1] = { call = n, ignored = inside_stop_fn }
+        out[#out + 1] = { call = n, ignored = inside_stop_fn, forced = inside_force_fn }
       end
       local is_stop_fn = stop_fn and n.name == stop_fn
-      local next_inside = inside_stop_fn or is_stop_fn
+      local is_force_fn = force_fn and n.name == force_fn
+      local next_inside_stop = inside_stop_fn or is_stop_fn
+      local next_inside_force = inside_force_fn or is_force_fn
       for _, arg in ipairs(n.args) do
         if n.type == "call_named" then
-          recurse(arg.val, next_inside)
+          recurse(arg.val, next_inside_stop, next_inside_force)
         else
-          recurse(arg, next_inside)
+          recurse(arg, next_inside_stop, next_inside_force)
         end
       end
     elseif n.type == "binop" then
-      recurse(n.left, inside_stop_fn)
-      recurse(n.right, inside_stop_fn)
+      recurse(n.left, inside_stop_fn, inside_force_fn)
+      recurse(n.right, inside_stop_fn, inside_force_fn)
     elseif n.type == "unop" then
-      recurse(n.operand, inside_stop_fn)
+      recurse(n.operand, inside_stop_fn, inside_force_fn)
     elseif n.type == "group" then
       for _, t in ipairs(n.tokens) do
-        recurse(t, inside_stop_fn)
+        recurse(t, inside_stop_fn, inside_force_fn)
       end
     end
   end
 
-  recurse(node, false)
+  recurse(node, false, false)
   return out
 end
 
@@ -804,7 +809,7 @@ end
 -- call found in the autoplace expression.  Includes calls whose weight params are
 -- unfound — callers must check result[i].base_density ~= "unfound" for eligibility.
 -- control_name is set on every entry (ore-level; identical across all calls).
-local function find_all_autoplace_arguments(autoplace, stop_fn)
+local function find_all_autoplace_arguments(autoplace, stop_fn, force_fn)
   local results = {}
   local expressions = {}
   local prob_str = autoplace.probability_expression
@@ -839,11 +844,12 @@ local function find_all_autoplace_arguments(autoplace, stop_fn)
       if patches_ne and type(patches_ne.expression) == "string" then
         local ok3, patches_ast = pcall(parse, patches_ne.expression)
         if ok3 then
-          local calls_with_ignored = find_all_calls_including_ignored(patches_ast, "resource_autoplace_all_patches", stop_fn)
+          local calls_with_ignored = find_all_calls_including_ignored(patches_ast, "resource_autoplace_all_patches", stop_fn, force_fn)
           for _, item in ipairs(calls_with_ignored) do
             local r, expr = extract_one_call_params(item.call, patches_name, parsed_rich)
             r.control_name = control_name
             r.ignored = item.ignored
+            r.forced = item.forced
             results[#results + 1] = r
             expressions[#expressions + 1] = expr
           end
@@ -854,11 +860,12 @@ local function find_all_autoplace_arguments(autoplace, stop_fn)
 
   -- Inline fallback: no *-patches NE found; call lives directly in probability_expression.
   if #results == 0 then
-    local calls_with_ignored = find_all_calls_including_ignored(prob_ast, "resource_autoplace_all_patches", stop_fn)
+    local calls_with_ignored = find_all_calls_including_ignored(prob_ast, "resource_autoplace_all_patches", stop_fn, force_fn)
     for _, item in ipairs(calls_with_ignored) do
       local r, expr = extract_one_call_params(item.call, nil, parsed_rich)
       r.control_name = control_name
       r.ignored = item.ignored
+      r.forced = item.forced
       results[#results + 1] = r
       expressions[#expressions + 1] = expr
     end

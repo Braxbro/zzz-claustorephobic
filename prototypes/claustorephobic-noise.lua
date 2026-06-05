@@ -75,15 +75,24 @@ data:extend{
     }
 }
 
---- IGNORE FUNCTION ---
+--- IGNORE & FORCE FUNCTIONS ---
 data:extend{
     {
         type = nfunc
       , name = modname .. "_ignore"
       , parameters = {"value"}
       , expression = "value"
-      , comment = "Does nothing by itself. ClaustOrephobic will not search for \z
+      , comment = "Does nothing by itself. ClaustOrephobic will not alter \z
         resource_autoplace_all_patches calls inside of the passed value."
+    }
+  , {
+        type = nfunc
+      , name = modname .. "_force"
+      , parameters = {"value"}
+      , expression = "value"
+      , comment = "Does nothing by itself. ClaustOrephobic will force-include \z
+        resource_autoplace_all_patches calls inside of the passed value, bypassing \z
+        eligibility checks if found (e.g. missing AoE drill category)."
     }
 }
 

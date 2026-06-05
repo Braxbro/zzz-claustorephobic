@@ -18,6 +18,11 @@ ClaustOrephobic = type(ClaustOrephobic) == "table" and ClaustOrephobic or {} -- 
     with the contents of each of the three tables being subgroup, type, or entity name strings respectively.
 
     If you wish to use this global in data.lua, before my mod loads, fear not. If you create this global table early, my mod will recognize that and keep any valid changes you've made to it.
+
+    NOISE FUNCTIONS:
+    - claustorephobic_ignore(ore_call) — wraps autoplace calls to exclude them from ClaustOrephobic processing
+    - claustorephobic_force(ore_call) — wraps autoplace calls to force-include them, bypassing eligibility checks
+      (useful for ores that fail the AoE drill check or other eligibility criteria)
 ]]
 
 if type(ClaustOrephobic.allowed_subgroups) == "table" then -- Entity subgroups that should not be altered.
