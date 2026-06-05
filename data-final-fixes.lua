@@ -3,7 +3,7 @@
 -- not used for anything but worthwhile to keep for debugging or whatever later.
 local compat_output = {}
 for mod, version in pairs(mods) do
-    compat_output[mod .. "_" .. version] = pcall(require("compat-patches." .. mod))
+    compat_output[mod .. "_" .. version] = pcall(require, "compat-patches." .. mod)
 end
 
 local util_functions = require("utils.parse-autoplace")
